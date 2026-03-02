@@ -11,8 +11,6 @@ namespace WebAPI.Dto.Usuario
         [Required(ErrorMessage = "Digite o Sobrenome")]
         public string LastName { get; set; }
         public string Email { get; set; }
-        public DateTime DataCreate { get; set; } = DateTime.Now;
-        public DateTime DataUpdate { get; set; }
 
         [Required(ErrorMessage = "Digite a senha")]
         public string Password { get; set; }

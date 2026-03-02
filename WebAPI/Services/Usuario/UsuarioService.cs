@@ -115,6 +115,9 @@ namespace WebAPI.Services.Usuario
 
                 user.PasswordHash = senhaHash;
                 user.PasswordSalt = senhaSalt;
+                user.DataCreate = DateTime.Now;
+                user.DataUpdate = DateTime.Now;
+
 
                 _context.Add(user);
                 await _context.SaveChangesAsync();
