@@ -80,7 +80,7 @@ namespace WebAPI.Services.Usuario
             {
                 var user = await _context.Users.FindAsync(id);
 
-                if(user == null)
+                if (user == null)
                 {
                     response.Message = "Usuário não localizado!";
                     return response;
@@ -129,16 +129,53 @@ namespace WebAPI.Services.Usuario
                 return response;
             }
         }
+        public async Task<ResponseModel<UsuarioModel>> UpdateUser(UsuarioEditarDto usuarioEditarDto)
+        {
+            ResponseModel<UsuarioModel> response = new ResponseModel<UsuarioModel>();
+
+            try
+            {
+                var user = await _context.Users.FindAsync(usuarioEditarDto.Id);
+                if (user == null)
+                {
+                    response.Message = "Usuário não localizado!";
+                    return response;
+                }
+
+                user.Name = usuarioEditarDto.Name;
+                user.LastName = usuarioEditarDto.LastName;
+                user.Email = usuarioEditarDto.Email;
+                user.User = usuarioEditarDto.User;
+                user.DataUpdate = DateTime.Now;
+
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+
+                response.Message = $"Usuário {user.Name} editado com sucesso!";
+                response.Data = user;
+
+                return response;
+
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.Status = false;
+                return response;
+            }
+        }
 
         private bool VerifyUserEmailExists(UsuarioCriarDto usuarioCriacaoDto)
         {
             var user = _context.Users.FirstOrDefault(d => d.Email == usuarioCriacaoDto.Email || d.User == usuarioCriacaoDto.User);
-            
-            if(user != null)
+
+            if (user != null)
             {
                 return false;
             }
             return true;
         }
+
+
     }
 }

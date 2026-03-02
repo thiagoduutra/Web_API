@@ -9,5 +9,6 @@ namespace WebAPI.Services.Usuario
         Task<ResponseModel<UsuarioModel>> GetUserById(int id);
         Task<ResponseModel<UsuarioModel>> DeleteUserById(int id);
         Task<ResponseModel<UsuarioModel>> CreateUser(UsuarioCriarDto usuarioCriarDto);
+        Task<ResponseModel<UsuarioModel>> UpdateUser(UsuarioEditarDto usuarioEditarDto);
     }
 }

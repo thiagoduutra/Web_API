@@ -13,8 +13,6 @@ namespace WebAPI.Dto.Usuario
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Token { get; set; }
-        public DateTime DataCreate { get; set; } = DateTime.Now;
-        public DateTime DataUpdate { get; set; }
 
     }
 }

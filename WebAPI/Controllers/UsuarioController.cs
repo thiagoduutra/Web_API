@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Dto.Usuario;
 using WebAPI.Services.Usuario;
 
 namespace WebAPI.Controllers
@@ -19,10 +20,6 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _usuarioInterface.GetAllUsers();
-            if (users.Status == false)
-            {
-                return BadRequest(users);
-            }
             return Ok(users);
         }
 
@@ -30,10 +27,6 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetUserById(int id)
         {
             var user = await _usuarioInterface.GetUserById(id);
-            if (user.Status == false)
-            {
-                return BadRequest(user);
-            }
             return Ok(user);
         }
 
@@ -44,6 +37,11 @@ namespace WebAPI.Controllers
             return Ok(user);
         }
 
-
+        [HttpPut]
+        public async Task<IActionResult> UpdateUser(UsuarioEditarDto usuarioEditarDto)
+        {
+            var users = await _usuarioInterface.UpdateUser(usuarioEditarDto);
+            return Ok(users);
+        }
     }
 }
