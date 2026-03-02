@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
+using WebAPI.Dto.Usuario;
 using WebAPI.Models;
+using WebAPI.Services.Senha;
 
 namespace WebAPI.Services.Usuario
 {
@@ -8,9 +11,14 @@ namespace WebAPI.Services.Usuario
     {
 
         private readonly AppDbContext _context;
-        public UsuarioService(AppDbContext context)
+        private readonly ISenhaInterface _senhaInterface;
+        private readonly IMapper _mapper;
+
+        public UsuarioService(AppDbContext context, ISenhaInterface senhaInterface, IMapper mapper)
         {
             _context = context;
+            _senhaInterface = senhaInterface;
+            _mapper = mapper;
         }
 
         public async Task<ResponseModel<List<UsuarioModel>>> GetAllUsers()
@@ -90,6 +98,47 @@ namespace WebAPI.Services.Usuario
                 response.Status = false;
                 return response;
             }
+        }
+        public async Task<ResponseModel<UsuarioModel>> CreateUser(UsuarioCriarDto usuarioCriarDto)
+        {
+            ResponseModel<UsuarioModel> response = new ResponseModel<UsuarioModel>();
+            try
+            {
+                if (!VerifyUserEmailExists(usuarioCriarDto))
+                {
+                    response.Message = "Email/Usuário já cadastrado!";
+                }
+
+                _senhaInterface.CreatePasswordHash(usuarioCriarDto.Password, out byte[] senhaHash, out byte[] senhaSalt);
+
+                UsuarioModel user = _mapper.Map<UsuarioModel>(usuarioCriarDto);
+
+                user.PasswordHash = senhaHash;
+                user.PasswordSalt = senhaSalt;
+
+                _context.Add(user);
+                await _context.SaveChangesAsync();
+
+                response.Message = $"Usuário {user.Name} cadastrado com sucesso!";
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.Status = false;
+                return response;
+            }
+        }
+
+        private bool VerifyUserEmailExists(UsuarioCriarDto usuarioCriacaoDto)
+        {
+            var user = _context.Users.FirstOrDefault(d => d.Email == usuarioCriacaoDto.Email || d.User == usuarioCriacaoDto.User);
+            
+            if(user != null)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

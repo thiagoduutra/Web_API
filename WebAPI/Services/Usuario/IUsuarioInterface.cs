@@ -1,4 +1,5 @@
-﻿using WebAPI.Models;
+﻿using WebAPI.Dto.Usuario;
+using WebAPI.Models;
 
 namespace WebAPI.Services.Usuario
 {
@@ -7,5 +8,6 @@ namespace WebAPI.Services.Usuario
         Task<ResponseModel<List<UsuarioModel>>> GetAllUsers();
         Task<ResponseModel<UsuarioModel>> GetUserById(int id);
         Task<ResponseModel<UsuarioModel>> DeleteUserById(int id);
+        Task<ResponseModel<UsuarioModel>> CreateUser(UsuarioCriarDto usuarioCriarDto);
     }
 }

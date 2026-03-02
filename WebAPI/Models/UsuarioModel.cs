@@ -7,7 +7,7 @@
         public string Name { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        public string Token { get; set; }
+        public string Token { get; set; } = string.Empty;
         public DateTime DataCreate { get; set; }
         public DateTime DataUpdate { get; set; }
         public byte[] PasswordHash { get; set; }

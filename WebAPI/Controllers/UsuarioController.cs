@@ -43,5 +43,7 @@ namespace WebAPI.Controllers
             var user = await _usuarioInterface.DeleteUserById(id);
             return Ok(user);
         }
+
+
     }
 }
