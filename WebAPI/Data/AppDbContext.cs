@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WebAPI.Models;
 
 namespace WebAPI.Data
 {
@@ -8,7 +9,7 @@ namespace WebAPI.Data
         {
         }
 
-
+        public DbSet<UsuarioModel> Users { get; set; }
 
     }
 }
