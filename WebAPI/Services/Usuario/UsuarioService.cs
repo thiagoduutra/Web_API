@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using WebAPI.Data;
 using WebAPI.Dto.Login;
 using WebAPI.Dto.Usuario;
 using WebAPI.Models;
+using WebAPI.Services.Auditoria;
 using WebAPI.Services.Senha;
 
 namespace WebAPI.Services.Usuario
@@ -14,12 +16,16 @@ namespace WebAPI.Services.Usuario
         private readonly AppDbContext _context;
         private readonly ISenhaInterface _senhaInterface;
         private readonly IMapper _mapper;
+        private readonly IAuditoriaInterface _auditoriaInterface;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UsuarioService(AppDbContext context, ISenhaInterface senhaInterface, IMapper mapper)
+        public UsuarioService(AppDbContext context, ISenhaInterface senhaInterface, IMapper mapper, IAuditoriaInterface auditoriaInterface, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _senhaInterface = senhaInterface;
             _mapper = mapper;
+            _auditoriaInterface = auditoriaInterface;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ResponseModel<List<UsuarioModel>>> GetAllUsers()
@@ -91,6 +97,13 @@ namespace WebAPI.Services.Usuario
                 await _context.SaveChangesAsync();
 
                 response.Message = $"Usuário {user.Name} removido com sucesso!";
+
+                var dataBefore= JsonConvert.SerializeObject(user);
+
+                var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(d => d.Type == "UserId")?.Value;
+
+                await _auditoriaInterface.CreateAuditsAsync("Remoção", userId, $"Antes: {dataBefore}");
+
                 return response;
             }
             catch (Exception ex)
@@ -146,6 +159,8 @@ namespace WebAPI.Services.Usuario
                     return response;
                 }
 
+                var dataBefore = JsonConvert.SerializeObject(user);
+
                 user.Name = usuarioEditarDto.Name;
                 user.LastName = usuarioEditarDto.LastName;
                 user.Email = usuarioEditarDto.Email;
@@ -157,6 +172,12 @@ namespace WebAPI.Services.Usuario
 
                 response.Message = $"Usuário {user.Name} editado com sucesso!";
                 response.Data = user;
+
+                var dataAfter = JsonConvert.SerializeObject(user);
+
+                var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(d => d.Type == "UserId")?.Value;
+
+                await _auditoriaInterface.CreateAuditsAsync("Atualização", userId, $"Antes: {dataBefore}<br/>, depois {dataAfter}");
 
                 return response;
 

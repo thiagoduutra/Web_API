@@ -10,6 +10,7 @@ namespace WebAPI.Data
         }
 
         public DbSet<UsuarioModel> Users { get; set; }
+        public DbSet<AuditoriaModel> Audits { get; set; }
 
     }
 }

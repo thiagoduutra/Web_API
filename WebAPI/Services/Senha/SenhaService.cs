@@ -38,7 +38,7 @@ namespace WebAPI.Services.Senha
             {
                 new Claim("Email", usuario.Email),
                 new Claim("Username", usuario.User),
-                new Claim("Id", usuario.Id.ToString()),
+                new Claim("UserId", usuario.Id.ToString()),
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_Config.GetSection("AppSettings:Token").Value));
@@ -53,5 +53,6 @@ namespace WebAPI.Services.Senha
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
             return jwt;
         }
+
     }
 }

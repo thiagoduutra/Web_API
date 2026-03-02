@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using WebAPI.Data;
+using WebAPI.Services.Auditoria;
 using WebAPI.Services.Senha;
 using WebAPI.Services.Usuario;
 
@@ -20,8 +21,11 @@ internal class Program
 
         builder.Services.AddScoped<ISenhaInterface, SenhaService>();
         builder.Services.AddScoped<IUsuarioInterface, UsuarioService>();
+        builder.Services.AddScoped<IAuditoriaInterface, AuditoriaService>();
 
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+        builder.Services.AddHttpContextAccessor();
 
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
