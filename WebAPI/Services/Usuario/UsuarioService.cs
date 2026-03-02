@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
+using WebAPI.Dto.Login;
 using WebAPI.Dto.Usuario;
 using WebAPI.Models;
 using WebAPI.Services.Senha;
@@ -167,7 +168,43 @@ namespace WebAPI.Services.Usuario
                 return response;
             }
         }
+        public async Task<ResponseModel<UsuarioModel>> Login(UsuarioLoginDto usuarioLoginDto)
+        {
+            ResponseModel<UsuarioModel> response = new ResponseModel<UsuarioModel>();
 
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(d => d.Email == usuarioLoginDto.Email);
+
+                if (user == null)
+                {
+                    response.Message = "Credenciais inválidas!";
+                    return response;
+                }
+
+                if (!_senhaInterface.VerifyPasswordHash(usuarioLoginDto.Password, user.PasswordHash, user.PasswordSalt))
+                {
+                    response.Message = "Credenciais inválidas!";
+                    return response;
+                }
+                var token = _senhaInterface.CreateToken(user);
+                user.Token = token;
+
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+
+                response.Data = user;
+                response.Message = "Usuário logado com sucesso!";
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.Status = false;
+                return response;
+            }
+        }
         private bool VerifyUserEmailExists(UsuarioCriarDto usuarioCriacaoDto)
         {
             var user = _context.Users.FirstOrDefault(d => d.Email == usuarioCriacaoDto.Email || d.User == usuarioCriacaoDto.User);
